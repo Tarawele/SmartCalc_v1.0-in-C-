@@ -981,12 +981,12 @@ static void Credit_Calc() {
     double bet = x3 / 12.0 / 100.0;
     double coefficient = (bet * pow((1 + bet), x2)) / (pow((1 + bet), x2) - 1);
     result = x1 * coefficient;
-    g_print("res = %lf\n", result);
+    // g_print("res = %lf\n", result);
   } else {
     double Cd = x1 / x2;
     double sum;
     for (int i = 0; i < x2; i++) {
-      double temp = (x1 - Cd * i) * x3 / 100 * 31 / 365;
+      double temp = (x1 - Cd * i) * x3 / 100 * 30 / 365;
       sum += temp;
     }
     result = Cd * x2 + sum;
@@ -1035,9 +1035,9 @@ static void Credit() {
   GtkWidget *label5 = gtk_label_new("Monthly payment");
   GtkWidget *label6 = gtk_label_new("Overpayment on Credit");
   GtkWidget *label7 = gtk_label_new("Total payment");
-  spinbox4_credit = gtk_spin_button_new_with_range(0, 10000000000, 0.1);
-  spinbox5_credit = gtk_spin_button_new_with_range(0, 10000000000, 0.1);
-  spinbox6_credit = gtk_spin_button_new_with_range(0, 10000000000, 0.1);
+  spinbox4_credit = gtk_spin_button_new_with_range(0, 10000000000, 0.01);
+  spinbox5_credit = gtk_spin_button_new_with_range(0, 10000000000, 0.01);
+  spinbox6_credit = gtk_spin_button_new_with_range(0, 10000000000, 0.01);
   GtkWidget *hbox3 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 1);
   gtk_box_append(GTK_BOX(hbox3), label5);
   gtk_box_append(GTK_BOX(hbox3), label6);
@@ -1063,17 +1063,24 @@ static void Credit() {
 }
 
 static void Deposit_Calc() {
-  double x1 =
-      gtk_spin_button_get_value((GtkSpinButton *)spinbox1_dep); // Credit
+  double x1 = gtk_spin_button_get_value(
+      (GtkSpinButton *)spinbox1_dep); // Deposit amount
   double x2 = gtk_spin_button_get_value(
-      (GtkSpinButton *)spinbox2_dep); // term in months
-  double x3 = gtk_spin_button_get_value((GtkSpinButton *)spinbox3_dep); // % bet
-  double x4 = gtk_spin_button_get_value((GtkSpinButton *)spinbox4_dep); // % bet
+      (GtkSpinButton *)spinbox2_dep); // Deposit term in days
+  double x3 = gtk_spin_button_get_value(
+      (GtkSpinButton *)spinbox5_dep); // % Interest rate
+  double x4 = gtk_spin_button_get_value(
+      (GtkSpinButton *)spinbox4_dep); // % Number of days in a year
+  double x5 =
+      gtk_spin_button_get_value((GtkSpinButton *)spinbox6_dep); // % Tax rate
+  x5 = (x5 * 1000000.0) / 100.0;
 
-  double result = x1 * x2 * x3 / x4 / 100.0;
+  double result = x1 * x2 * x3 / x4 / 100.0 + 0.01;
 
+  double x6 = (result - x5) * 0.13;
   gtk_spin_button_set_value((GtkSpinButton *)spinbox9_dep, result);
-  gtk_spin_button_set_value((GtkSpinButton *)spinbox10_dep, result + x1);
+  gtk_spin_button_set_value((GtkSpinButton *)spinbox10_dep, x6);
+  gtk_spin_button_set_value((GtkSpinButton *)spinbox13_dep, x1);
 }
 
 static void Deposit() {
@@ -1082,19 +1089,21 @@ static void Deposit() {
   gtk_window_set_title(GTK_WINDOW(window), "Deposit calculator");
 
   GtkWidget *label1 = gtk_label_new("Deposit amount");
-  GtkWidget *label2 = gtk_label_new("Deposit term");
+  GtkWidget *label2 = gtk_label_new("Deposit term in days");
+  GtkWidget *label4 = gtk_label_new("365 or 366");
   GtkWidget *label5 = gtk_label_new("Interest rate");
   GtkWidget *label6 = gtk_label_new("Tax rate");
   GtkWidget *label7 = gtk_label_new("Periodicity of payments");
   GtkWidget *label8 = gtk_label_new("Capitalization of interest");
   GtkWidget *label11 = gtk_label_new("Replenishments list");
   GtkWidget *label12 = gtk_label_new("partial withdrawals list");
-  GtkWidget *label3 = gtk_label_new("Number of days");
-  GtkWidget *label4 = gtk_label_new("365 or 366");
+  // GtkWidget *label3 = gtk_label_new("Number of days");
   spinbox1_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
   spinbox2_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
-  spinbox3_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
+  spinbox5_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
   spinbox4_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
+  spinbox6_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.01);
+  // spinbox3_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
   GtkWidget *hbox1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   GtkWidget *hbox2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -1102,28 +1111,37 @@ static void Deposit() {
   gtk_window_set_child(GTK_WINDOW(window), vbox);
   gtk_box_append(GTK_BOX(hbox2), label1);
   gtk_box_append(GTK_BOX(hbox2), label2);
-  gtk_box_append(GTK_BOX(hbox2), label3);
+  // gtk_box_append(GTK_BOX(hbox2), label3);
+  gtk_box_append(GTK_BOX(hbox2), label5);
   gtk_box_append(GTK_BOX(hbox2), label4);
+  gtk_box_append(GTK_BOX(hbox2), label6);
   gtk_box_set_spacing(GTK_BOX(hbox2), 80);
   gtk_box_append(GTK_BOX(vbox), hbox2);
   gtk_box_append(GTK_BOX(vbox), hbox1);
   gtk_box_append(GTK_BOX(hbox1), spinbox1_dep);
   gtk_box_append(GTK_BOX(hbox1), spinbox2_dep);
-  gtk_box_append(GTK_BOX(hbox1), spinbox3_dep);
+  // gtk_box_append(GTK_BOX(hbox1), spinbox3_dep);
+  gtk_box_append(GTK_BOX(hbox1), spinbox5_dep);
   gtk_box_append(GTK_BOX(hbox1), spinbox4_dep);
+  gtk_box_append(GTK_BOX(hbox1), spinbox6_dep);
 
-  GtkWidget *label9 = gtk_label_new("Interest rate");
+  GtkWidget *label9 = gtk_label_new("Accrued interest");
   GtkWidget *label10 = gtk_label_new("Tax amount");
-  spinbox9_dep = gtk_spin_button_new_with_range(0, 10000000000, 0.1);
-  spinbox10_dep = gtk_spin_button_new_with_range(0, 10000000000, 0.1);
+  GtkWidget *label13 = gtk_label_new("Deposit amount by the end of term");
+  spinbox9_dep = gtk_spin_button_new_with_range(0, 10000000000, 0.01);
+  spinbox10_dep = gtk_spin_button_new_with_range(0, 10000000000, 0.01);
+  spinbox13_dep = gtk_spin_button_new_with_range(0, 10000000000, 0.01);
   GtkWidget *hbox3 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_append(GTK_BOX(hbox3), label9);
   gtk_box_append(GTK_BOX(hbox3), label10);
+  gtk_box_append(GTK_BOX(hbox3), label13);
   gtk_box_set_spacing(GTK_BOX(hbox3), 120);
 
   GtkWidget *hbox4 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_append(GTK_BOX(hbox4), spinbox9_dep);
   gtk_box_append(GTK_BOX(hbox4), spinbox10_dep);
+  gtk_box_append(GTK_BOX(hbox4), spinbox13_dep);
+  gtk_box_set_spacing(GTK_BOX(hbox4), 50);
   gtk_box_append(GTK_BOX(vbox), hbox3);
   gtk_box_append(GTK_BOX(vbox), hbox4);
   gtk_box_append(GTK_BOX(vbox), button);

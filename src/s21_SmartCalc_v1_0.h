@@ -31,6 +31,8 @@ GtkWidget *spinbox8_dep;
 GtkWidget *spinbox9_dep;
 GtkWidget *spinbox10_dep;
 GtkWidget *spinbox11_dep;
+GtkWidget *spinbox12_dep;
+GtkWidget *spinbox13_dep;
 
 typedef struct application {
   GtkApplication *app;
