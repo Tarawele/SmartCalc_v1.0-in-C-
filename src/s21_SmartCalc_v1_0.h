@@ -86,7 +86,7 @@ static void DrawGraph(GtkDrawingArea *drawing_area, cairo_t *cr, int width,
                       int height, App *application);
 static void CreateGraphWindow(GtkWidget *button, App *application);
 static void DestroyDialogWindow(GtkWidget *dialog, App *application);
-static void DestroyApp(GtkWidget *window, App *application);
+static int DestroyApp(GtkWidget *window, App *application);
 static void AdditionNegX(GtkWidget *button, App *application);
 static void SubstractionNegX(GtkWidget *button, App *application);
 static void AdditionPosX(GtkWidget *button, App *application);

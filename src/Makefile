@@ -40,7 +40,7 @@ dvi:
 	open readme/index.html
 
 dist:
-	tar -cf s21_SmartCalc_v1.0.tar *.c *.h Makefile readme ui
+	tar -cf s21_SmartCalc_v1.0.tar *.c *.h Makefile readme
 
 checks: cppcheck style leaks
 
@@ -67,9 +67,9 @@ endif
 run: s21_smartcalc
 	./s21_SmartCalc
 install: uninstall s21_smartcalc
-	@mkdir ~/SmartCalc_mskyler_v1.0
-	@install ./s21_SmartCalc ~/SmartCalc_mskyler_v1.0/
+	@mkdir ~/Zulma_Calc1
+	@install ./s21_SmartCalc ~/Zulma_Calc1/
 	@make clean
 
 uninstall:
-	@rm -rf ~/SmartCalc_mskyler_v1.0
+	@rm -rf ~/Zulma_Calc1

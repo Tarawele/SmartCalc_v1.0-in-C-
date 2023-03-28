@@ -459,23 +459,28 @@ static void DestroyDialogWindow(GtkWidget *dialog, App *application) {
   application->dialog = NULL;
 }
 
-static void DestroyApp(GtkWidget *app, App *application) {
+static int DestroyApp(GtkWidget *app, App *application) {
+  int out_empty = 0;
   if (application->graph == NULL) {
+    return out_empty;
   } else {
     gtk_window_close(GTK_WINDOW(application->graph));
   }
 
   if (application->errorWindow == NULL) {
+    return out_empty;
   } else {
     gtk_window_close(GTK_WINDOW(application->errorWindow));
   }
 
   if (application->trigs == NULL) {
+    return out_empty;
   } else {
     gtk_window_close(GTK_WINDOW(application->trigs));
   }
 
   if (application->actions == NULL) {
+    return out_empty;
   } else {
     gtk_window_close(GTK_WINDOW(application->actions));
   }
