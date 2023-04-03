@@ -29,8 +29,8 @@ static char *GetToken(char *expression, int *position, Stack *operands) {
         break;
       } else if (expression[*position] == 'l' &&
                  expression[*position + 1] == 'n') { // ln
-        strncat(token, expression + (*position), 2);
-        (*position) += 2;
+        strncat(token, expression + (*position), 3);
+        (*position) += 3;
 
         break;
       } else { // cos, tan, sin, log
@@ -146,7 +146,6 @@ char *Parser(char *expression) {
             if (operators->is_empty_stack(operators) || operands->size < 1) {
               break;
             }
-
             PerformMathFunc(operands, operators);
           } else {
             if (operators->is_empty_stack(operators) || operands->size < 2) {

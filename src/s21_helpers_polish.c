@@ -122,10 +122,8 @@ void PerformMathFunc(Stack *operands, Stack *operators) {
   if (strcmp(funcName, "log") == 0) {
     resDouble = log10(digit);
   }
-
   sprintf(resChar, "%lf", resDouble);
   resCharPointer = resChar;
-
   operands->push(operands, resCharPointer);
 
   free(funcName);

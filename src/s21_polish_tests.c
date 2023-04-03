@@ -2,8 +2,6 @@
 
 #include "s21_polish.h"
 
-#define FAIL "FAIL"
-
 START_TEST(funcWithoutBracket) {
   char *res;
   char *res2;
@@ -17,11 +15,11 @@ START_TEST(funcWithoutBracket) {
   res4 = Parser("(2^2)");
   res5 = Parser("(1/2)");
 
-  ck_assert_msg(strcmp(res, "-4.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res2, "1.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res3, "3.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res4, "4.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res5, "0.500000") == 0, FAIL);
+  ck_assert_msg(strcmp(res, "-4.000000") == 0, 0);
+  ck_assert_msg(strcmp(res2, "1.000000") == 0, 0);
+  ck_assert_msg(strcmp(res3, "3.000000") == 0, 0);
+  ck_assert_msg(strcmp(res4, "4.000000") == 0, 0);
+  ck_assert_msg(strcmp(res5, "0.500000") == 0, 0);
 
   free(res);
   free(res2);
@@ -43,11 +41,11 @@ START_TEST(funcWithBracket) {
   res4 = Parser("(-(5*2^2))");
   res5 = Parser("(-(1/2)*(-5))");
 
-  ck_assert_msg(strcmp(res, "4.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res2, "-10.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res3, "0.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res4, "-20.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res5, "2.500000") == 0, FAIL);
+  ck_assert_msg(strcmp(res, "4.000000") == 0, 0);
+  ck_assert_msg(strcmp(res2, "-10.000000") == 0, 0);
+  ck_assert_msg(strcmp(res3, "0.000000") == 0, 0);
+  ck_assert_msg(strcmp(res4, "-20.000000") == 0, 0);
+  ck_assert_msg(strcmp(res5, "2.500000") == 0, 0);
 
   free(res);
   free(res2);
@@ -67,10 +65,10 @@ START_TEST(trigFuncWithoutBracket) {
   res3 = Parser("(tan(1))");
   res4 = Parser("(sqrt(4+ln(1)))");
 
-  ck_assert_msg(strcmp(res, "1.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res2, "0.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res3, "1.557408") == 0, FAIL);
-  ck_assert_msg(strcmp(res4, "2.000000") == 0, FAIL);
+  ck_assert_msg(strcmp(res, "1.000000") == 0, 0);
+  ck_assert_msg(strcmp(res2, "0.000000") == 0, 0);
+  ck_assert_msg(strcmp(res3, "1.557408") == 0, 0);
+  ck_assert_msg(strcmp(res4, "2.000000") == 0, 0);
 
   free(res);
   free(res2);
@@ -95,13 +93,13 @@ START_TEST(trigFuncWithBracket) {
   res6 = Parser("(log(10))");
   res7 = Parser("(-5.1+(cos(4+(sqrt(36)))))");
 
-  ck_assert_msg(strcmp(res, "1.570796") == 0, FAIL);
-  ck_assert_msg(strcmp(res2, "0.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res3, "0.785398") == 0, FAIL);
-  ck_assert_msg(strcmp(res4, "2.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res5, "2.302585") == 0, FAIL);
-  ck_assert_msg(strcmp(res6, "1.000000") == 0, FAIL);
-  ck_assert_msg(strcmp(res7, "-5.939072") == 0, FAIL);
+  ck_assert_msg(strcmp(res, "1.570796") == 0, 0);
+  ck_assert_msg(strcmp(res2, "0.000000") == 0, 0);
+  ck_assert_msg(strcmp(res3, "0.785398") == 0, 0);
+  ck_assert_msg(strcmp(res4, "2.000000") == 0, 0);
+  ck_assert_msg(strcmp(res5, "2.302585") == 0, 0);
+  ck_assert_msg(strcmp(res6, "1.000000") == 0, 0);
+  ck_assert_msg(strcmp(res7, "-5.939072") == 0, 0);
 
   free(res);
   free(res2);

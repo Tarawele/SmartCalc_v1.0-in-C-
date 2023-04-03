@@ -331,13 +331,13 @@ static double ApplyDrawSettings(cairo_t *cr, double xLength, double xStPos,
 
 static void DrawGraph(GtkDrawingArea *drawing_area, cairo_t *cr, int width,
                       int height, App *application) {
-  char expression[256] = {0};
-  char xPos[256] = {0};
-  char xNeg[256] = {0};
-  double xPosDouble = 0;
-  double xNegDouble = 0;
-  double yDouble = 0;
-  double xDouble = 0;
+  char expression[256] = {'0'};
+  char xPos[256] = {'0'};
+  char xNeg[256] = {'0'};
+  double xPosDouble = 0.0;
+  double xNegDouble = 0.0;
+  double yDouble = 0.0;
+  double xDouble = 0.0;
   int counter = 0;
 
   gtk_window_close(GTK_WINDOW(application->dialog));
@@ -433,7 +433,7 @@ static void CreateGraphWindow(GtkWidget *button, App *application) {
                    G_CALLBACK(DestroyGraphWindow), &application);
   gtk_window_set_title(GTK_WINDOW(application->graph), "Graph");
   gtk_window_set_default_size(GTK_WINDOW(application->graph), 300, 300);
-  gtk_window_set_resizable(GTK_WINDOW(application->graph), false);
+  gtk_window_set_resizable(GTK_WINDOW(application->graph), true);
 
   gtk_window_set_child(GTK_WINDOW(application->graph), boxDrawArea);
   gtk_box_append(GTK_BOX(boxDrawArea), drawArea);
@@ -620,8 +620,8 @@ static void CreateDialogGrid(App *application) {
 }
 
 static void CreateDialogLabels(App *application) {
-  application->labelPosX = gtk_label_new(" Length x ->");
-  application->labelNegX = gtk_label_new(" St pos x ->");
+  application->labelPosX = gtk_label_new("X-axixs");
+  application->labelNegX = gtk_label_new("Y-axis");
 }
 
 static void CreateDialogEntries(App *application) {
@@ -657,12 +657,11 @@ static void CreateDialogElements(App *application) {
 }
 
 static void CreateDialogWindow(GtkWidget *button, App *application) {
-  if (application->dialog != NULL) {
-    gtk_window_close(GTK_WINDOW(application->dialog));
-  }
+  // if (application->dialog != NULL) {
+  //   gtk_window_close(GTK_WINDOW(application->dialog));
+  // }
 
   char expression[256] = {0};
-
   strcpy(expression, "(");
   strcat(expression, gtk_entry_buffer_get_text(application->bufferEntry));
 
@@ -688,6 +687,7 @@ static void CreateDialogWindow(GtkWidget *button, App *application) {
   } else {
     CreateErrorWindow(application);
   }
+  // free(expression);
 }
 
 static void DestroyTrigPannel(GtkWidget *button, App *application) {
@@ -842,10 +842,8 @@ static void ClearSymbolInEntry(GtkWidget *button, App *application) {
       strncat(errorMessage, entryTextPointer, 5);
       break;
     }
-
     entryTextPointer++;
   }
-
   if (strcmp(errorMessage, "error") == 0) {
     memset(entryText, 0, 256);
   }
@@ -855,21 +853,51 @@ static void ClearSymbolInEntry(GtkWidget *button, App *application) {
   gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(application->bufferEntry),
                             entryTextOnExit, strlen(entryTextOnExit));
 }
+static void AllClearSymbolInEntry(GtkWidget *button, App *application) {
+  char entryText[256] = {0};
+  char *entryTextPointer;
+  char entryTextOnExit[256] = {0};
+  char errorMessage[6] = {0};
+
+  strcpy(entryText, gtk_entry_buffer_get_text(application->bufferEntry));
+
+  entryTextPointer = entryText;
+
+  while (*entryTextPointer != '\0') {
+    if (*entryTextPointer == 'e') {
+      strncat(errorMessage, entryTextPointer, 5);
+      break;
+    }
+    entryTextPointer++;
+  }
+  if (strcmp(errorMessage, "error") == 0) {
+    memset(entryText, 0, 256);
+  }
+
+  strncat(entryTextOnExit, entryText, strlen(entryText) - strlen(entryText));
+
+  gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(application->bufferEntry),
+                            entryTextOnExit, strlen(entryTextOnExit));
+}
 
 static void CreateEntry(App *application) {
   GtkWidget *boxLeft = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   GtkWidget *boxRight = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   GtkWidget *clearButton = gtk_button_new_with_label("C");
+  GtkWidget *allclearButton = gtk_button_new_with_label("AC");
 
   application->bufferEntry = gtk_entry_buffer_new("0", 1);
   application->entry = gtk_entry_new_with_buffer(application->bufferEntry);
 
   g_signal_connect(clearButton, "clicked", G_CALLBACK(ClearSymbolInEntry),
                    application);
+  g_signal_connect(allclearButton, "clicked", G_CALLBACK(AllClearSymbolInEntry),
+                   application);
 
   gtk_box_append(GTK_BOX(application->boxEntry), boxLeft);
   gtk_box_append(GTK_BOX(application->boxEntry), application->entry);
   gtk_box_append(GTK_BOX(application->boxEntry), clearButton);
+  gtk_box_append(GTK_BOX(application->boxEntry), allclearButton);
   gtk_box_append(GTK_BOX(application->boxEntry), boxRight);
   gtk_widget_set_can_focus(application->entry, false);
 
@@ -975,32 +1003,42 @@ static int RunApp(int argc, char **argv) {
 }
 
 static void Credit_Calc() {
+  double payMa = 0.0;
   double x1 =
       gtk_spin_button_get_value((GtkSpinButton *)spinbox1_credit); // Credit
   double x2 = gtk_spin_button_get_value(
       (GtkSpinButton *)spinbox2_credit); // term in months
   double x3 = gtk_spin_button_get_value((GtkSpinButton *)spinbox3_credit); // %
-  double result;
+  double result, result2 = 0.0;
   // annuity
   if (!strcmp("0", gtk_combo_box_get_active_id((GtkComboBox *)downwidget))) {
     double bet = x3 / 12.0 / 100.0;
     double coefficient = (bet * pow((1 + bet), x2)) / (pow((1 + bet), x2) - 1);
     result = x1 * coefficient;
-    // g_print("res = %lf\n", result);
+    result2 = result;
+    gtk_spin_button_set_value((GtkSpinButton *)spinbox4_credit, result);
+    gtk_spin_button_set_value((GtkSpinButton *)spinbox5_credit,
+                              (result * x2) - x1);
+    gtk_spin_button_set_value((GtkSpinButton *)spinbox6_credit,
+                              (result * x2) - x1 + x1);
   } else {
-    double Cd = x1 / x2;
-    double sum;
-    for (int i = 0; i < x2; i++) {
-      double temp = (x1 - Cd * i) * x3 / 100 * 30 / 365;
-      sum += temp;
+    double every_pl = 0.0;
+    double main_dolg = 0.0, main_dolg2 = 0.0;
+    main_dolg = x1 / x2;
+    main_dolg2 = main_dolg;
+    double tmp = x1;
+    payMa = main_dolg * x3 / 100.0 * 30.41666 / 365.0;
+    every_pl = main_dolg + x1 * x3 / 100.0 * 30.41666 / 365.0;
+    result = every_pl;
+    double sum = 0.0;
+    for (int i = 1; i < x2; i++) {
+      sum += main_dolg + (x1 - (main_dolg2 * i)) * x3 / 100 * 30.41666 / 365.0;
     }
-    result = Cd * x2 + sum;
+    result2 = (sum + every_pl) - x1;
+    gtk_spin_button_set_value((GtkSpinButton *)spinbox4_credit, result);
+    gtk_spin_button_set_value((GtkSpinButton *)spinbox5_credit, result2);
+    gtk_spin_button_set_value((GtkSpinButton *)spinbox6_credit, (x1 + result2));
   }
-  gtk_spin_button_set_value((GtkSpinButton *)spinbox4_credit, result);
-  gtk_spin_button_set_value((GtkSpinButton *)spinbox5_credit,
-                            (result * x2) - x1);
-  gtk_spin_button_set_value((GtkSpinButton *)spinbox6_credit,
-                            (result * x2) - x1 + x1);
 }
 
 static void Credit() {
@@ -1074,15 +1112,20 @@ static void Deposit_Calc() {
       (GtkSpinButton *)spinbox2_dep); // Deposit term in days
   double x3 = gtk_spin_button_get_value(
       (GtkSpinButton *)spinbox5_dep); // % Interest rate
-  double x4 = gtk_spin_button_get_value(
-      (GtkSpinButton *)spinbox4_dep); // % Number of days in a year
+  // double x4 = gtk_spin_button_get_value(
+  //     (GtkSpinButton *)spinbox4_dep); // % Number of days in a year
   double x5 =
       gtk_spin_button_get_value((GtkSpinButton *)spinbox6_dep); // % Tax rate
   x5 = (x5 * 1000000.0) / 100.0;
-
-  double result = x1 * x2 * x3 / x4 / 100.0 + 0.01;
-
-  double x6 = (result - x5) * 0.13;
+  // x5 = 75000.0;
+  double x6 = 0.0;
+  // x5 = 7.5;
+  double result = x1 * x2 * x3 / 365.0 / 100.0;
+  if (x5 == 0.0 || (result <= 75000.0)) {
+    x6 = 0.0;
+  } else {
+    x6 = (result - x5) * 0.13;
+  }
   gtk_spin_button_set_value((GtkSpinButton *)spinbox9_dep, result);
   gtk_spin_button_set_value((GtkSpinButton *)spinbox10_dep, x6);
   gtk_spin_button_set_value((GtkSpinButton *)spinbox13_dep, x1);
@@ -1094,19 +1137,14 @@ static void Deposit() {
   gtk_window_set_title(GTK_WINDOW(window), "Deposit calculator");
 
   GtkWidget *label1 = gtk_label_new("Deposit amount");
-  GtkWidget *label2 = gtk_label_new("Deposit term in days");
-  GtkWidget *label4 = gtk_label_new("365 or 366");
+  GtkWidget *label2 = gtk_label_new("Deposit term (Days)");
+  // GtkWidget *label4 = gtk_label_new("Days in a one year (type 365 or 366)");
   GtkWidget *label5 = gtk_label_new("Interest rate");
   GtkWidget *label6 = gtk_label_new("Tax rate");
-  GtkWidget *label7 = gtk_label_new("Periodicity of payments");
-  GtkWidget *label8 = gtk_label_new("Capitalization of interest");
-  GtkWidget *label11 = gtk_label_new("Replenishments list");
-  GtkWidget *label12 = gtk_label_new("partial withdrawals list");
-  // GtkWidget *label3 = gtk_label_new("Number of days");
   spinbox1_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
   spinbox2_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
   spinbox5_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
-  spinbox4_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
+  // spinbox4_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
   spinbox6_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.01);
   // spinbox3_dep = gtk_spin_button_new_with_range(0, 1000000000, 0.1);
   GtkWidget *hbox1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -1118,7 +1156,7 @@ static void Deposit() {
   gtk_box_append(GTK_BOX(hbox2), label2);
   // gtk_box_append(GTK_BOX(hbox2), label3);
   gtk_box_append(GTK_BOX(hbox2), label5);
-  gtk_box_append(GTK_BOX(hbox2), label4);
+  // gtk_box_append(GTK_BOX(hbox2), label4);
   gtk_box_append(GTK_BOX(hbox2), label6);
   gtk_box_set_spacing(GTK_BOX(hbox2), 80);
   gtk_box_append(GTK_BOX(vbox), hbox2);
@@ -1154,7 +1192,7 @@ static void Deposit() {
   g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(Deposit_Calc),
                    (gpointer) "7");
 
-  gtk_window_set_default_size((GtkWindow *)window, 1000, 80);
+  gtk_window_set_default_size((GtkWindow *)window, 500, 80);
   gtk_widget_show(window);
 }
 
@@ -1209,7 +1247,6 @@ static void Calc(GtkWidget *button, App *application) {
 
   gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(application->bufferEntry),
                             onExitEntryText, strlen(onExitEntryText));
-
   if (isParse) {
     free(onExitEntryText);
   }

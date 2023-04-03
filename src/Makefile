@@ -32,6 +32,7 @@ endif
 	@./unit-test
 	@lcov -t "test" -o test.info -c -d .
 	@genhtml -o report test.info
+	open report/index.html
 	
 clean:
 	@/bin/rm -rf *.o *.a *.log *.aux *.pdf *.tar test unit-test *.gcno *gcda report *.info leak_check s21_SmartCalc
@@ -45,7 +46,8 @@ dist:
 checks: cppcheck style leaks
 
 style:
-	python3 ../materials/linters/cpplint.py --extensions=c *.c *.h
+	clang-format -n *.c *.h
+	@# @python3 ../materials/linters/cpplint.py --extensions=c *.c *.h
 
 cppcheck:
 	cppcheck --enable=all --suppress=missingIncludeSystem . *.c
